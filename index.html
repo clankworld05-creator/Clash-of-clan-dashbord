@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CoC Clan Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #121212; color: #fff; padding: 20px; }
+    .card { background: #1e1e1e; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #333; padding: 10px; text-align: left; }
+    th { background-color: #2a2a2a; }
+  </style>
+</head>
+<body>
+  <h1>Clan Dashboard</h1>
+  <div class="card" id="clan-info">Loading clan details...</div>
+
+  <h2>Clan Members</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Tag</th>
+        <th>Role</th>
+        <th>Town Hall</th>
+      </tr>
+    </thead>
+    <tbody id="members-list">
+      <tr><td colspan="4">Loading members...</td></tr>
+    </tbody>
+  </table>
+
+  <script src="script.js"></script>
+</body>
+  </html>
+  
