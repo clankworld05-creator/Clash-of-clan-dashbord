@@ -3,33 +3,261 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CoC Clan Dashboard</title>
+  <title>Clan Performance Dashboard</title>
   <style>
-    body { font-family: Arial, sans-serif; background-color: #121212; color: #fff; padding: 20px; }
-    .card { background: #1e1e1e; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border: 1px solid #333; padding: 10px; text-align: left; }
-    th { background-color: #2a2a2a; }
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --accent-cyan: #00f2fe;
+      --accent-pink: #ff007f;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      margin: 0;
+      padding: 15px;
+    }
+
+    /* Clan Header Card */
+    .header-card {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      margin-bottom: 20px;
+    }
+
+    .header-card h1 {
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      color: var(--accent-cyan);
+    }
+
+    .header-card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      border: 1px solid #334155;
+    }
+
+    .stat-card .val {
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--accent-cyan);
+    }
+
+    .stat-card .lbl {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Table Styling */
+    .table-container {
+      background: var(--card-bg);
+      border-radius: 16px;
+      overflow-x: auto;
+      border: 1px solid #334155;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      background: #0f172a;
+      color: var(--accent-cyan);
+      padding: 14px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 14px;
+      border-bottom: 1px solid #334155;
+      font-size: 14px;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    tr:hover {
+      background: #334155;
+      cursor: pointer;
+    }
+
+    .th-badge {
+      background: #312e81;
+      color: #a5b4fc;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 12px;
+    }
+
+    /* Bottom Modal / Member Detail Drawer */
+    .drawer {
+      position: fixed;
+      bottom: -100%;
+      left: 0;
+      right: 0;
+      background: #1e1b4b;
+      border-top: 2px solid var(--accent-cyan);
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.8);
+      transition: bottom 0.3s ease-in-out;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .drawer.active { bottom: 0; }
+
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .drawer-header h3 { margin: 0; color: var(--accent-cyan); }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    /* Progress Bar */
+    .progress-box { margin-bottom: 12px; }
+
+    .progress-box label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 5px;
+    }
+
+    .bar {
+      background: #0f172a;
+      height: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-pink), var(--accent-cyan));
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* Equipment Badges */
+    .equipment-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    .eq-chip {
+      background: #334155;
+      border: 1px solid #475569;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #f1f5f9;
+    }
   </style>
 </head>
 <body>
-  <h1>Clan Dashboard</h1>
-  <div class="card" id="clan-info">Loading clan details...</div>
 
-  <h2>Clan Members</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Tag</th>
-        <th>Role</th>
-        <th>Town Hall</th>
-      </tr>
-    </thead>
-    <tbody id="members-list">
-      <tr><td colspan="4">Loading members...</td></tr>
-    </tbody>
-  </table>
+  <div class="header-card">
+    <h1 id="clan-name">Loading Clan Data...</h1>
+    <p id="clan-tag">#2908VU98U</p>
+    <p id="clan-desc" style="margin-top: 8px;"></p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="val" id="total-members">0</div>
+      <div class="lbl">Members</div>
+    </div>
+    <div class="stat-card">
+      <div class="val" id="clan-points">0</div>
+      <div class="lbl">Clan Points</div>
+    </div>
+    <div class="stat-card">
+      <div class="val" id="war-wins">0</div>
+      <div class="lbl">War Wins</div>
+    </div>
+  </div>
+
+  <h3>Member Roster</h3>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Role</th>
+          <th>TH</th>
+          <th>Trophies</th>
+        </tr>
+      </thead>
+      <tbody id="member-table-body">
+        <tr><td colspan="4" style="text-align: center;">Fetching data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Member Details Drawer -->
+  <div class="drawer" id="member-drawer">
+    <div class="drawer-header">
+      <h3 id="drawer-name">Member Name</h3>
+      <button class="close-btn" onclick="closeDrawer()">✕</button>
+    </div>
+
+    <div class="progress-box">
+      <label><span>CWL Performance Score</span><span id="cwl-score-text">0%</span></label>
+      <div class="bar"><div class="fill" id="cwl-bar"></div></div>
+    </div>
+
+    <div class="progress-box">
+      <label><span>Hero Equipment Level</span><span id="eq-score-text">0%</span></label>
+      <div class="bar"><div class="fill" id="eq-bar"></div></div>
+    </div>
+
+    <h4 style="margin-top: 15px; margin-bottom: 8px; color: var(--accent-cyan);">Equipped Equipment</h4>
+    <div class="equipment-list" id="equipment-chips">
+      <!-- Chips will be added dynamically -->
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
