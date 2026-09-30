@@ -1,23 +1,29 @@
-const CLAN_TAG = "%232908VU98U"; // Clan Tag: #2908VU98U
-const API_URL = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://api.clashofclans.com/v1/clans/${CLAN_TAG}`)}`;
+const API_TOKEN = "EyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6IjE3MjAzMzUyLTEzMmYtNDY5Yi1iYjI4LWM1MWQzOTcxM2UyZCIsImlhdCI6MTc5MDc5NDU5Miwic3ViIjoiZGV2ZWxvcGVyLzM3NTcwNDdiLTFjYTQtNDQ0OC05MmE3LWY4NzYwNTgyZjVmZiIsInNjb3BlcyI6WyJjbGFzaCJdLCJsaW1pdHMiOlt7InRpZXIiOiJkZXZlbG9wZXIvc2lsdmVyIiwidHlwZSI6InRocm90dGxpbmcifSx7ImNpZHJzIjpbIjE1Mi41OS4xMjEuMjM3Il0sInR5cGUiOiJjbGllbnQifV19.nXrQoaufwOxjKoXfy8PXQbduQJ-x-gFU7S8zik1LilIwqRvGgC-u2CYa8L9PHUecLz72uGFAnyuMjRNHLdoadQ";
+const CLAN_TAG = "%232908VU98U"; 
+
+// Direct CORS Proxy with Auth Header support
+const TARGET_URL = `https://api.clashofclans.com/v1/clans/${CLAN_TAG}`;
+const API_URL = `https://corsproxy.io/?${encodeURIComponent(TARGET_URL)}`;
 
 async function fetchClanData() {
   try {
-    const response = await fetch(API_URL);
-    if (!response.ok) throw new Error("Network response was not ok");
+    const response = await fetch(API_URL, {
+      headers: {
+        "Authorization": `Bearer ${API_TOKEN}`
+      }
+    });
 
-    const wrapper = await response.json();
-    const data = JSON.parse(wrapper.contents); // Proxy response decode karein
-
-    if (data.reason || data.message) {
-      throw new Error(data.message || "API Error");
+    if (!response.ok) {
+      throw new Error(`HTTP Error Status: ${response.status}`);
     }
 
+    const data = await response.json();
+
     // Fill Clan Details
-    document.getElementById("clan-name").innerText = data.name;
-    document.getElementById("clan-tag").innerText = data.tag;
+    document.getElementById("clan-name").innerText = data.name || "Clan Name";
+    document.getElementById("clan-tag").innerText = data.tag || "#2908VU98U";
     document.getElementById("clan-desc").innerText = data.description || "No description provided.";
-    document.getElementById("total-members").innerText = `${data.members}/50`;
+    document.getElementById("total-members").innerText = `${data.members || 0}/50`;
     document.getElementById("clan-points").innerText = (data.clanPoints || 0).toLocaleString();
     document.getElementById("war-wins").innerText = data.warWins || 0;
 
@@ -43,7 +49,8 @@ async function fetchClanData() {
 
   } catch (error) {
     console.error("Error fetching clan data:", error);
-    document.getElementById("clan-name").innerText = "Error Loading Data";
+    document.getElementById("clan-name").innerText = "IP / API Token Error";
+    document.getElementById("clan-desc").innerText = "Please update your IP on developer.clashofclans.com";
   }
 }
 
@@ -82,4 +89,4 @@ function capitalize(str) {
 }
 
 fetchClanData();
-    
+        
